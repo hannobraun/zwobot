@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+mkdir -p output
+rustc -o output/zwobot source/rust/main.rs
+./output/zwobot $@
