@@ -1,5 +1,7 @@
 use std::os;
 
+mod inotify;
+
 
 fn main() {
 	let args = os::args();
