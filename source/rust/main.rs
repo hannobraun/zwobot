@@ -1,3 +1,5 @@
+extern crate libc;
+
 use std::os;
 
 use inotify::INotify;

@@ -1,12 +1,12 @@
-use std::c_str::CString;
-use std::libc;
-use std::libc::{
+use libc;
+use libc::{
 	c_char,
 	c_int,
 	c_void,
 	size_t,
 	ssize_t,
 	uint32_t };
+use std::c_str::CString;
 use std::mem;
 use std::os;
 use std::ptr;
