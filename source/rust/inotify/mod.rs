@@ -3,8 +3,6 @@ use libc::{
 	c_char,
 	c_int,
 	c_void,
-	size_t,
-	ssize_t,
 	uint32_t };
 use std::c_str::CString;
 use std::mem;
@@ -12,13 +10,8 @@ use std::os;
 use std::ptr;
 
 
-extern {
-	fn inotify_init1(flags: c_int) -> c_int;
-	fn inotify_add_watch(fd: c_int, pathname: *c_char, mask: uint32_t) -> c_int;
-	fn inotify_rm_watch(fd: c_int, wd: c_int) -> c_int;
-	fn read(fd: c_int, buf: *c_void, count: size_t) -> ssize_t;
-	fn close(fd: c_int) -> c_int;
-}
+mod ffi;
+
 
 
 pub struct INotify {
@@ -41,7 +34,7 @@ impl INotify {
 	}
 
 	pub fn init_with_flags(flags: int) -> Result<INotify, ~str> {
-		let fd = unsafe { inotify_init1(flags as c_int) };
+		let fd = unsafe { ffi::inotify_init1(flags as c_int) };
 
 		match fd {
 			-1 => Err(last_error()),
@@ -52,7 +45,7 @@ impl INotify {
 	pub fn add_watch(&self, path_name: &str, mask: u32) -> Result<Watch, ~str> {
 		let wd = unsafe {
 			let c_path_name = path_name.to_c_str().unwrap();
-			inotify_add_watch(self.fd, c_path_name, mask)
+			ffi::inotify_add_watch(self.fd, c_path_name, mask)
 		};
 
 		match wd {
@@ -62,7 +55,7 @@ impl INotify {
 	}
 
 	pub fn rm_watch(&self, watch: Watch) -> Result<(), ~str> {
-		let result = unsafe { inotify_rm_watch(self.fd, watch) };
+		let result = unsafe { ffi::inotify_rm_watch(self.fd, watch) };
 		match result {
 			0  => Ok(()),
 			-1 => Err(last_error()),
@@ -83,7 +76,7 @@ impl INotify {
 		let event_size = mem::size_of::<Event>();
 
 		let result = unsafe {
-			read(
+			ffi::read(
 				self.fd,
 				&event as *Event as *c_void,
 				event_size as u64)
@@ -99,7 +92,7 @@ impl INotify {
 	}
 
 	pub fn close(&self) -> Result<(), ~str> {
-		let result = unsafe { close(self.fd) };
+		let result = unsafe { ffi::close(self.fd) };
 		match result {
 			0 => Ok(()),
 			_ => Err(last_error())
