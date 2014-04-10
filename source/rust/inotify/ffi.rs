@@ -17,6 +17,8 @@ extern {
 
 
 #[allow(non_camel_case_types)]
+#[allow(raw_pointer_deriving)]
+#[deriving(Show)]
 pub struct inotify_event {
 	pub wd    : c_int,
 	pub mask  : uint32_t,
