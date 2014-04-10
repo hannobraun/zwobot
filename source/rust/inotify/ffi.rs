@@ -8,6 +8,7 @@ use libc::{
 
 
 extern {
+	pub fn inotify_init() -> c_int;
 	pub fn inotify_init1(flags: c_int) -> c_int;
 	pub fn inotify_add_watch(fd: c_int, pathname: *c_char, mask: uint32_t) -> c_int;
 	pub fn inotify_rm_watch(fd: c_int, wd: c_int) -> c_int;
