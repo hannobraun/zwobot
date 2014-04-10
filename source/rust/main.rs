@@ -36,7 +36,7 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(_)      => (),
+			Ok(event)  => print!("{}\n", event),
 			Err(error) => {
 				print!("{}", error);
 				break;
