@@ -10,7 +10,7 @@ use std::os;
 use std::ptr;
 
 
-mod ffi;
+pub mod ffi;
 
 
 
