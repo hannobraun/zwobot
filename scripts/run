@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
 mkdir -p output
-rustc -o output/zwobot source/rust/zwobot/main.rs &&
+rustc --out-dir output source/rust/inotify/lib.rs &&
+rustc -o output/zwobot -L output source/rust/zwobot/main.rs &&
 ./output/zwobot $@

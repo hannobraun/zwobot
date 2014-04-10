@@ -7,8 +7,8 @@ use std::mem;
 use std::os;
 use std::ptr;
 
-use inotify::ffi;
-use inotify::ffi::inotify_event;
+use ffi;
+use ffi::inotify_event;
 
 
 type Watch = c_int;

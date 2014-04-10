@@ -1,10 +1,11 @@
 extern crate libc;
 
+extern crate inotify;
+
+
 use std::os;
 
 use inotify::INotify;
-
-mod inotify;
 
 
 fn main() {
