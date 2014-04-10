@@ -4,8 +4,7 @@ use libc::{
 	c_void,
 	size_t,
 	ssize_t,
-	uint32_t
-};
+	uint32_t };
 
 
 extern {
