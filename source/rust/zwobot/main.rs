@@ -19,17 +19,11 @@ fn main() {
 		Err(error)  => fail!(error)
 	};
 
-	let mut last_watch = 0;
 	for file in files.iter() {
-		last_watch = match inotify.add_watch(*file, inotify::ffi::IN_MODIFY) {
+		match inotify.add_watch(*file, inotify::ffi::IN_MODIFY) {
 			Ok(watch)  => watch,
 			Err(error) => fail!(error)
 		};
-	}
-
-	match inotify.rm_watch(last_watch) {
-		Ok(_)      => (),
-		Err(error) => fail!(error)
 	}
 
 	loop {
