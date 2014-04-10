@@ -11,12 +11,12 @@ use inotify::ffi;
 use inotify::ffi::inotify_event;
 
 
+type Watch = c_int;
+
+
 pub struct INotify {
 	fd: c_int
 }
-
-type Watch = c_int;
-
 
 impl INotify {
 	pub fn init() -> Result<INotify, ~str> {
