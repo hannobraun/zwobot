@@ -12,6 +12,11 @@ use inotify::INotify;
 fn main() {
 	let args = os::args();
 
+	if args.len() < 2 {
+		print!("Usage: {} COMMAND FILE [FILE...]\n", args[0]);
+		return;
+	}
+
 	let command = args[1].to_owned();
 	let files   = args.slice_from(2);
 
