@@ -72,8 +72,6 @@ impl INotify {
 				event_size as u64)
 		};
 
-		print!("{} {}\n", result, event_size);
-
 		match result {
 			0  => Err(~"end of file"),
 			-1 => Err(last_error()),
