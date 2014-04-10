@@ -16,6 +16,10 @@ extern {
 }
 
 
+pub static IN_CLOEXEC : c_int = 0o2000000;
+pub static IN_NONBLOCK: c_int = 0o4000;
+
+
 #[allow(non_camel_case_types)]
 #[allow(raw_pointer_deriving)]
 #[deriving(Show)]
