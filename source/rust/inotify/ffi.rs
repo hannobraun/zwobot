@@ -14,3 +14,12 @@ extern {
 	pub fn read(fd: c_int, buf: *c_void, count: size_t) -> ssize_t;
 	pub fn close(fd: c_int) -> c_int;
 }
+
+
+pub struct Event {
+	pub wd    : c_int,
+	pub mask  : uint32_t,
+	pub cookie: uint32_t,
+	pub len   : uint32_t,
+	pub name  : *c_char
+}

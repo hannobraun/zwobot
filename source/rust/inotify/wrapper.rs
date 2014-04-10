@@ -1,15 +1,14 @@
 use libc;
 use libc::{
-	c_char,
 	c_int,
-	c_void,
-	uint32_t };
+	c_void };
 use std::c_str::CString;
 use std::mem;
 use std::os;
 use std::ptr;
 
 use inotify::ffi;
+use inotify::ffi::Event;
 
 
 pub struct INotify {
@@ -17,14 +16,6 @@ pub struct INotify {
 }
 
 type Watch = c_int;
-
-struct Event {
-	wd    : c_int,
-	mask  : uint32_t,
-	cookie: uint32_t,
-	len   : uint32_t,
-	name  : *c_char
-}
 
 
 impl INotify {
