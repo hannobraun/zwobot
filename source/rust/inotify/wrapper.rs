@@ -8,7 +8,7 @@ use std::os;
 use std::ptr;
 
 use inotify::ffi;
-use inotify::ffi::Event;
+use inotify::ffi::inotify_event;
 
 
 pub struct INotify {
@@ -54,8 +54,8 @@ impl INotify {
 		}
 	}
 
-	pub fn event(&self) -> Result<Event, ~str> {
-		let event = Event {
+	pub fn event(&self) -> Result<inotify_event, ~str> {
+		let event = inotify_event {
 			wd    : 0,
 			mask  : 0,
 			cookie: 0,
@@ -63,12 +63,12 @@ impl INotify {
 			name  : ptr::null()
 		};
 
-		let event_size = mem::size_of::<Event>();
+		let event_size = mem::size_of::<inotify_event>();
 
 		let result = unsafe {
 			ffi::read(
 				self.fd,
-				&event as *Event as *c_void,
+				&event as *inotify_event as *c_void,
 				event_size as u64)
 		};
 

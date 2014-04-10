@@ -16,7 +16,8 @@ extern {
 }
 
 
-pub struct Event {
+#[allow(non_camel_case_types)]
+pub struct inotify_event {
 	pub wd    : c_int,
 	pub mask  : uint32_t,
 	pub cookie: uint32_t,
