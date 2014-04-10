@@ -11,7 +11,7 @@ use ffi;
 use ffi::inotify_event;
 
 
-type Watch = c_int;
+pub type Watch = c_int;
 
 
 pub struct INotify {
