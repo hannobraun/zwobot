@@ -24,7 +24,7 @@ fn main() {
 	let mut last_watch = 0;
 	for file in files.iter() {
 		last_watch = match inotify.add_watch(*file, inotify::ffi::IN_MODIFY) {
-			Ok(watch)      => watch,
+			Ok(watch)  => watch,
 			Err(error) => fail!(error)
 		};
 	}
