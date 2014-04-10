@@ -3,6 +3,7 @@ extern crate libc;
 extern crate inotify;
 
 
+use std::io::Process;
 use std::os;
 
 use inotify::INotify;
@@ -28,7 +29,7 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(event)  => print!("{}\n", event),
+			Ok(_)      => run_command(command),
 			Err(error) => {
 				print!("{}", error);
 				break;
@@ -40,4 +41,16 @@ fn main() {
 		Ok(_)      => (),
 		Err(error) => fail!(error)
 	}
+}
+
+fn run_command(command: &str) {
+	let mut process = match Process::new(command, []) {
+		Ok(process) => process,
+		Err(error)  => fail!("{}", error)
+	};
+
+	assert!(process.wait().success());
+
+	print!("{}", process.stdout.take().expect("no stdout").read_to_str().unwrap());
+	print!("{}", process.stderr.take().expect("no stderr").read_to_str().unwrap());
 }
