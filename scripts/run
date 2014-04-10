@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 mkdir -p output
-rustc -o output/zwobot source/rust/main.rs &&
+rustc -o output/zwobot source/rust/zwobot/main.rs &&
 ./output/zwobot $@
