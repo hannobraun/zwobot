@@ -3,4 +3,4 @@
 mkdir -p output
 rustc --out-dir output vendor/inotify-rs/src/lib.rs &&
 rustc -o output/zwobot -L output source/rust/zwobot/main.rs &&
-./output/zwobot $@
+./output/zwobot "$@"
