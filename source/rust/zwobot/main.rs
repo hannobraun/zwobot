@@ -20,6 +20,9 @@ fn main() {
 	let command = args[1].to_owned();
 	let files   = args.slice_from(2);
 
+	let command_words: ~[~str] =
+		command.words().map(|x| x.to_owned()).collect();
+
 	let inotify = match INotify::init() {
 		Ok(inotify) => inotify,
 		Err(error)  => fail!(error)
@@ -34,7 +37,7 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(_)      => run_command(command.words().map(|x| x.to_owned()).collect()),
+			Ok(_)      => run_command(command_words),
 			Err(error) => {
 				print!("{}", error);
 				break;
@@ -48,7 +51,7 @@ fn main() {
 	}
 }
 
-fn run_command(command: ~[~str]) {
+fn run_command(command: &[~str]) {
 	let executable = command.head().unwrap();
 	let args       = command.tail();
 
