@@ -34,7 +34,7 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(_)      => run_command(command),
+			Ok(_)      => run_command(command.words().map(|x| x.to_owned()).collect()),
 			Err(error) => {
 				print!("{}", error);
 				break;
@@ -48,8 +48,11 @@ fn main() {
 	}
 }
 
-fn run_command(command: &str) {
-	let mut process = match Process::new(command, []) {
+fn run_command(command: ~[~str]) {
+	let executable = command.head().unwrap();
+	let args       = command.tail();
+
+	let mut process = match Process::new(*executable, args) {
 		Ok(process) => process,
 		Err(error)  => fail!("{}", error)
 	};
