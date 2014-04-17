@@ -38,7 +38,7 @@ fn main() {
 	loop {
 		match inotify.event() {
 			Ok(_) => {
-				print!("{}\n", command);
+				print!("\n\n\n=== {}\n", command);
 				run_command(command_words)
 			},
 			Err(error) => {
