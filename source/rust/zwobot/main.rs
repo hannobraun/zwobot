@@ -37,7 +37,10 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(_)      => run_command(command_words),
+			Ok(_) => {
+				print!("{}\n", command);
+				run_command(command_words)
+			},
 			Err(error) => {
 				print!("{}", error);
 				break;
