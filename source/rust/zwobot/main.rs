@@ -63,7 +63,7 @@ fn run_command(command: &[~str]) {
 		Err(error)  => fail!("{}", error)
 	};
 
-	assert!(process.wait().success());
+	process.wait().success();
 
 	print!("{}", process.stdout.take().expect("no stdout").read_to_str().unwrap());
 	print!("{}", process.stderr.take().expect("no stderr").read_to_str().unwrap());
