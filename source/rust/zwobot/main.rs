@@ -1,4 +1,5 @@
 extern crate libc;
+extern crate time;
 
 extern crate inotify;
 
@@ -38,9 +39,13 @@ fn main() {
 	loop {
 		match inotify.event() {
 			Ok(_) => {
-				print!("\n\n\n=== START {}\n", command);
+				print!("\n\n\n=== {} START {}\n",
+					time::now().rfc3339(),
+					command);
 				run_command(command_words);
-				print!("=== FINISH {}\n", command);
+				print!("=== {} FINISH {}\n",
+					time::now().rfc3339(),
+					command);
 			},
 			Err(error) => {
 				print!("{}", error);
