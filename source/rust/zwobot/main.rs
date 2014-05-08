@@ -38,8 +38,9 @@ fn main() {
 	loop {
 		match inotify.event() {
 			Ok(_) => {
-				print!("\n\n\n=== {}\n", command);
-				run_command(command_words)
+				print!("\n\n\n=== START {}\n", command);
+				run_command(command_words);
+				print!("=== FINISH {}\n", command);
 			},
 			Err(error) => {
 				print!("{}", error);
