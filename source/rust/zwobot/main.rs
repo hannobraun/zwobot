@@ -4,7 +4,7 @@ extern crate time;
 extern crate inotify;
 
 
-use std::io::Process;
+use std::io::Command;
 use std::os;
 
 use inotify::INotify;
@@ -61,10 +61,10 @@ fn main() {
 }
 
 fn run_command(command: &Vec<~str>) {
-	let executable = command.get(0);
+	let executable = command.get(0).clone();
 	let args       = command.tail();
 
-	let mut process = match Process::new(*executable, args) {
+	let mut process = match Command::new(executable).args(args).spawn() {
 		Ok(process) => process,
 		Err(error)  => fail!("{}", error)
 	};
