@@ -14,14 +14,14 @@ fn main() {
 	let args = os::args();
 
 	if args.len() < 2 {
-		print!("Usage: {} COMMAND FILE [FILE...]\n", args[0]);
+		print!("Usage: {} COMMAND FILE [FILE...]\n", args.get(0));
 		return;
 	}
 
-	let command = args[1].to_owned();
+	let command = args.get(1).to_owned();
 	let files   = args.slice_from(2);
 
-	let command_words: ~[~str] =
+	let command_words: Vec<~str> =
 		command.words().map(|x| x.to_owned()).collect();
 
 	let inotify = match INotify::init() {
@@ -42,7 +42,7 @@ fn main() {
 				print!("\n\n\n=== {} START {}\n",
 					time::now().rfc3339(),
 					command);
-				run_command(command_words);
+				run_command(&command_words);
 				print!("=== {} FINISH {}\n",
 					time::now().rfc3339(),
 					command);
@@ -60,8 +60,8 @@ fn main() {
 	}
 }
 
-fn run_command(command: &[~str]) {
-	let executable = command.head().unwrap();
+fn run_command(command: &Vec<~str>) {
+	let executable = command.get(0);
 	let args       = command.tail();
 
 	let mut process = match Process::new(*executable, args) {
@@ -69,7 +69,7 @@ fn run_command(command: &[~str]) {
 		Err(error)  => fail!("{}", error)
 	};
 
-	process.wait().success();
+	let _ = process.wait();
 
 	print!("{}", process.stdout.take().expect("no stdout").read_to_str().unwrap());
 	print!("{}", process.stderr.take().expect("no stderr").read_to_str().unwrap());
