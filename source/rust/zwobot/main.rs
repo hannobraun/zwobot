@@ -4,10 +4,12 @@ extern crate time;
 extern crate inotify;
 
 
-use std::io::Command;
 use std::os;
 
 use inotify::INotify;
+
+
+mod runner;
 
 
 fn main() {
@@ -21,8 +23,7 @@ fn main() {
 	let command = args.get(1).to_owned();
 	let files   = args.slice_from(2);
 
-	let command_words: Vec<~str> =
-		command.words().map(|x| x.to_owned()).collect();
+	let runner = runner::new(command.clone());
 
 	let inotify = match INotify::init() {
 		Ok(inotify) => inotify,
@@ -38,11 +39,11 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(_) => {
+			Ok(event) => {
 				print!("\n\n\n=== {} START {}\n",
 					time::now().rfc3339(),
 					command);
-				run_command(&command_words);
+				runner.send(event);
 				print!("=== {} FINISH {}\n",
 					time::now().rfc3339(),
 					command);
@@ -58,19 +59,4 @@ fn main() {
 		Ok(_)      => (),
 		Err(error) => fail!(error)
 	}
-}
-
-fn run_command(command: &Vec<~str>) {
-	let executable = command.get(0).clone();
-	let args       = command.tail();
-
-	let mut process = match Command::new(executable).args(args).spawn() {
-		Ok(process) => process,
-		Err(error)  => fail!("{}", error)
-	};
-
-	let _ = process.wait();
-
-	print!("{}", process.stdout.take().expect("no stdout").read_to_str().unwrap());
-	print!("{}", process.stderr.take().expect("no stderr").read_to_str().unwrap());
 }
