@@ -2,7 +2,11 @@ use std::comm::{
 	Disconnected,
 	Empty
 };
-use std::io::Command;
+use std::io::{
+	BufferedReader,
+	Command,
+	PipeStream
+};
 use std::io::timer;
 use time;
 
@@ -67,13 +71,25 @@ fn run(executable: ~str, args: &[~str]) -> Sender<()> {
 
 		print!("\n\n\n=== {} START {}\n", time::now().rfc3339(), command);
 
-		let _ = process.wait();
+		printer(process.stdout.take().expect("no stdout"));
+		printer(process.stderr.take().expect("no stderr"));
 
-		print!("{}", process.stdout.take().expect("no stdout").read_to_str().unwrap());
-		print!("{}", process.stderr.take().expect("no stderr").read_to_str().unwrap());
+		let _ = process.wait();
 
 		print!("=== {} FINISH {}\n", time::now().rfc3339(), command);
 	});
 
 	sender
+}
+
+fn printer(pipe: PipeStream) {
+	spawn(proc() {
+		let mut reader = BufferedReader::new(pipe);
+		for l in reader.lines() {
+			match l {
+				Ok(line)   => print!("{}", line),
+				Err(error) => fail!("{}", error)
+			}
+		}
+	});
 }
