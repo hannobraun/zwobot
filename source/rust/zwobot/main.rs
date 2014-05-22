@@ -37,6 +37,8 @@ fn main() {
 		};
 	}
 
+	runner.send(());
+
 	loop {
 		match inotify.event() {
 			Ok(_) =>
