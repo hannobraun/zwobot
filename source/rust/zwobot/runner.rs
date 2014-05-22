@@ -69,8 +69,8 @@ fn run(executable: ~str, args: &[~str]) -> Sender<()> {
 
 		print!("\n\n\n=== {} START {}\n", time::now().rfc3339(), command);
 
-		printer(process.stdout.take().expect("no stdout"));
-		printer(process.stderr.take().expect("no stderr"));
+		printer("stdout".to_owned(), process.stdout.take().expect("no stdout"));
+		printer("stderr".to_owned(), process.stderr.take().expect("no stderr"));
 
 		let _ = process.wait();
 
@@ -80,12 +80,12 @@ fn run(executable: ~str, args: &[~str]) -> Sender<()> {
 	sender
 }
 
-fn printer(pipe: PipeStream) {
+fn printer(prefix: ~str, pipe: PipeStream) {
 	spawn(proc() {
 		let mut reader = BufferedReader::new(pipe);
 		for l in reader.lines() {
 			match l {
-				Ok(line)   => print!("{}", line),
+				Ok(line)   => print!("[{}] {}", prefix, line),
 				Err(error) => fail!("{}", error)
 			}
 		}
