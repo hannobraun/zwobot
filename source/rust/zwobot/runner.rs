@@ -10,10 +10,8 @@ use std::io::{
 use std::io::timer;
 use time;
 
-use inotify::ffi::inotify_event;
 
-
-pub fn new(command_str: ~str) -> Sender<inotify_event> {
+pub fn new(command_str: ~str) -> Sender<()> {
 	let command_words: Vec<~str> =
 		command_str.words().map(|x| x.to_owned()).collect();
 

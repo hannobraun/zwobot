@@ -39,8 +39,8 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(event) =>
-				runner.send(event),
+			Ok(_) =>
+				runner.send(()),
 
 			Err(error) => {
 				print!("{}", error);
