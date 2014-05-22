@@ -39,15 +39,9 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(event) => {
-				print!("\n\n\n=== {} START {}\n",
-					time::now().rfc3339(),
-					command);
-				runner.send(event);
-				print!("=== {} FINISH {}\n",
-					time::now().rfc3339(),
-					command);
-			},
+			Ok(event) =>
+				runner.send(event),
+
 			Err(error) => {
 				print!("{}", error);
 				break;

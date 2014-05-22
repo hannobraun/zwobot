@@ -4,6 +4,7 @@ use std::comm::{
 };
 use std::io::Command;
 use std::io::timer;
+use time;
 
 use inotify::ffi::inotify_event;
 
@@ -64,10 +65,14 @@ fn run(executable: ~str, args: &[~str]) -> Sender<()> {
 			Err(error)  => fail!("{}", error)
 		};
 
+		print!("\n\n\n=== {} START {}\n", time::now().rfc3339(), command);
+
 		let _ = process.wait();
 
 		print!("{}", process.stdout.take().expect("no stdout").read_to_str().unwrap());
 		print!("{}", process.stderr.take().expect("no stderr").read_to_str().unwrap());
+
+		print!("=== {} FINISH {}\n", time::now().rfc3339(), command);
 	});
 
 	sender
