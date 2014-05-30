@@ -4,6 +4,7 @@ extern crate time;
 extern crate inotify;
 
 
+use std::io;
 use std::os;
 
 use inotify::INotify;
@@ -39,6 +40,8 @@ fn main() {
 
 	runner.send(());
 
+	read_manual_input(runner.clone());
+
 	loop {
 		match inotify.event() {
 			Ok(_) =>
@@ -55,4 +58,12 @@ fn main() {
 		Ok(_)      => (),
 		Err(error) => fail!(error)
 	}
+}
+
+fn read_manual_input(runner: Sender<()>) {
+	spawn(proc() {
+		for _ in io::stdin().lines() {
+			runner.send(())
+		}
+	})
 }
