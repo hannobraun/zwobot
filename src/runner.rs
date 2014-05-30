@@ -67,7 +67,33 @@ fn runner(executable: ~str, args: &[~str]) -> Sender<()> {
 
 	spawn(proc() {
 		loop {
-			let _ = receiver.recv();
+			// If multiple events have accumulated during the run, it should
+			// only trigger one additional run.
+			// Please note that this is different from deduplication:
+			// - Deduplication makes sure that subsequent events with little
+			//   delay between them only trigger a single run.
+			// - Another event that occurs during a run _should_ trigger a
+			//   second run.
+			// - However, multiple events during a run should only trigger a
+			//   second run, not a third, fourth etc.
+			let mut no_events_received = true;
+			loop {
+				match receiver.try_recv() {
+					Ok(_) =>
+						no_events_received = false,
+
+					Err(error) => match error {
+						Empty =>
+							break,
+						Disconnected =>
+							fail!("Channel unexpectedly disconnected")
+					}
+				}
+			}
+
+			if no_events_received {
+				let _ = receiver.recv();
+			}
 
 			let mut process = match command.spawn() {
 				Ok(process) => process,
