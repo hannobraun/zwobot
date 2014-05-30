@@ -8,4 +8,4 @@ fi
 mkdir -p output
 git submodule update --init &&
 $RUSTC --out-dir output vendor/inotify-rs/src/lib.rs &&
-$RUSTC -o output/zwobot -L output source/rust/zwobot/main.rs
+$RUSTC -o output/zwobot -L output src/main.rs
