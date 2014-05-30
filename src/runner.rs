@@ -27,8 +27,8 @@ pub fn new(command_str: ~str) -> Sender<()> {
 			let _ = receiver.recv();
 
 			match waiting_command {
-				Some(sender) => drop(sender),
-				None         => ()
+				Some(run) => drop(run),
+				None      => ()
 			}
 
 			waiting_command = Some(run(executable.clone(), args));
