@@ -18,63 +18,75 @@ pub fn new(command_str: ~str) -> Sender<()> {
 	let executable = command_words.get(0).clone();
 	let args       = command_words.tail().to_owned();
 
+	let runner = runner(executable, args);
+	deduplicator(runner)
+}
+
+fn deduplicator(runner: Sender<()>) -> Sender<()> {
 	let (sender, receiver) = channel();
 
 	spawn(proc() {
-		let mut waiting_run = None;
-
 		loop {
 			let _ = receiver.recv();
 
-			match waiting_run {
-				Some(run) => drop(run),
-				None      => ()
+			// Don't pass the event on immediately. There might be another one
+			// directly after that. We're only going to pass one of them.
+			loop {
+				timer::sleep(50);
+
+				match receiver.try_recv() {
+					Ok(_) => {
+						// Another event. Do nothing, wait again.
+						()
+					},
+
+					Err(error) => match error {
+						Empty => {
+							// No event followed. break out of the loop and pass
+							// a single event on.
+							break;
+						},
+						Disconnected =>
+							fail!("Channel unexpectedly disconnected")
+					}
+				}
 			}
 
-			waiting_run = Some(run(executable.clone(), args));
+			runner.send(());
 		}
 	});
 
 	sender
 }
 
-fn run(executable: ~str, args: &[~str]) -> Sender<()> {
+fn runner(executable: ~str, args: &[~str]) -> Sender<()> {
 	let mut command = Command::new(executable);
 	command.args(args);
 
 	let (sender, receiver) = channel();
 
 	spawn(proc() {
-		// Don't execute the command right away. Another event that triggers the
-		// same command might follow almost immediately. In that case, this run
-		// is going to be cancelled.
-		timer::sleep(50);
+		loop {
+			let _ = receiver.recv();
 
-		match receiver.try_recv() {
-			Ok(_) => (),
+			let mut process = match command.spawn() {
+				Ok(process) => process,
+				Err(error)  => fail!("{}", error)
+			};
 
-			Err(error) => match error {
-				Empty        => (),
-				Disconnected => {
-					// We're cancelled! Return!
-					return;
-				}
-			}
+			print!("\n\n\n=== {} START {}\n", time::now().rfc3339(), command);
+
+			print(
+				"stdout".to_owned(),
+				process.stdout.take().expect("no stdout"));
+			print(
+				"stderr".to_owned(),
+				process.stderr.take().expect("no stderr"));
+
+			let _ = process.wait();
+
+			print!("=== {} FINISH {}\n", time::now().rfc3339(), command);
 		}
-
-		let mut process = match command.spawn() {
-			Ok(process) => process,
-			Err(error)  => fail!("{}", error)
-		};
-
-		print!("\n\n\n=== {} START {}\n", time::now().rfc3339(), command);
-
-		print("stdout".to_owned(), process.stdout.take().expect("no stdout"));
-		print("stderr".to_owned(), process.stderr.take().expect("no stderr"));
-
-		let _ = process.wait();
-
-		print!("=== {} FINISH {}\n", time::now().rfc3339(), command);
 	});
 
 	sender
