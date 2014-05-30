@@ -21,17 +21,17 @@ pub fn new(command_str: ~str) -> Sender<()> {
 	let (sender, receiver) = channel();
 
 	spawn(proc() {
-		let mut waiting_command = None;
+		let mut waiting_run = None;
 
 		loop {
 			let _ = receiver.recv();
 
-			match waiting_command {
+			match waiting_run {
 				Some(run) => drop(run),
 				None      => ()
 			}
 
-			waiting_command = Some(run(executable.clone(), args));
+			waiting_run = Some(run(executable.clone(), args));
 		}
 	});
 
