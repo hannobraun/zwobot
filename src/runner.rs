@@ -13,7 +13,7 @@ use time;
 
 pub fn new(command_str: String) -> Sender<()> {
 	let command_words: Vec<String> =
-		command_str.as_slice().words().map(|x| x.to_owned()).collect();
+		command_str.as_slice().words().map(|x| x.to_str()).collect();
 
 	let executable = command_words.get(0).clone();
 	let args       = command_words.tail().to_owned();
@@ -103,10 +103,10 @@ fn runner(executable: String, args: &[String]) -> Sender<()> {
 			print!("\n\n\n=== {} START {}\n", time::now().rfc3339(), command);
 
 			print(
-				"stdout".to_owned(),
+				"stdout".to_str(),
 				process.stdout.take().expect("no stdout"));
 			print(
-				"stderr".to_owned(),
+				"stderr".to_str(),
 				process.stderr.take().expect("no stderr"));
 
 			let _ = process.wait();
