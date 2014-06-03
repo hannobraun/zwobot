@@ -11,9 +11,9 @@ use std::io::timer;
 use time;
 
 
-pub fn new(command_str: ~str) -> Sender<()> {
-	let command_words: Vec<~str> =
-		command_str.words().map(|x| x.to_owned()).collect();
+pub fn new(command_str: String) -> Sender<()> {
+	let command_words: Vec<String> =
+		command_str.as_slice().words().map(|x| x.to_owned()).collect();
 
 	let executable = command_words.get(0).clone();
 	let args       = command_words.tail().to_owned();
@@ -59,7 +59,7 @@ fn deduplicator(runner: Sender<()>) -> Sender<()> {
 	sender
 }
 
-fn runner(executable: ~str, args: &[~str]) -> Sender<()> {
+fn runner(executable: String, args: &[String]) -> Sender<()> {
 	let mut command = Command::new(executable);
 	command.args(args);
 
@@ -118,7 +118,7 @@ fn runner(executable: ~str, args: &[~str]) -> Sender<()> {
 	sender
 }
 
-fn print(prefix: ~str, pipe: PipeStream) {
+fn print(prefix: String, pipe: PipeStream) {
 	spawn(proc() {
 		let mut reader = BufferedReader::new(pipe);
 		for l in reader.lines() {
