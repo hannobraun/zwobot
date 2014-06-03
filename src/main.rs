@@ -47,16 +47,9 @@ fn main() {
 			Ok(_) =>
 				runner.send(()),
 
-			Err(error) => {
-				print!("{}", error);
-				break;
-			}
+			Err(error) =>
+				fail!("Error retrieving inotify event: {}", error)
 		}
-	}
-
-	match inotify.close() {
-		Ok(_)      => (),
-		Err(error) => fail!(error)
 	}
 }
 
