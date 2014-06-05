@@ -32,7 +32,7 @@ fn main() {
 	};
 
 	for file in files.iter() {
-		match inotify.add_watch(file.as_slice(), inotify::ffi::IN_MODIFY) {
+		match inotify.add_watch(&Path::new(file.as_slice()), inotify::ffi::IN_MODIFY) {
 			Ok(watch)  => watch,
 			Err(error) => fail!(error)
 		};
