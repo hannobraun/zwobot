@@ -46,8 +46,13 @@ fn main() {
 
 	loop {
 		match inotify.event() {
-			Ok(_) =>
-				runner.send(()),
+			Ok(event) => {
+				if event.mask != inotify::ffi::IN_MODIFY {
+					add_files(&inotify, paths.as_slice())
+				}
+
+				runner.send(())
+			},
 
 			Err(error) =>
 				fail!("Error retrieving inotify event: {}", error)
@@ -58,6 +63,18 @@ fn main() {
 fn add_files(inotify: &INotify, files: &[Path]) {
 	for path in files.iter() {
 		if path.is_dir() {
+			match inotify.add_watch(path,
+					inotify::ffi::IN_MODIFY
+					| inotify::ffi::IN_CREATE
+					| inotify::ffi::IN_DELETE
+					| inotify::ffi::IN_DELETE_SELF
+					| inotify::ffi::IN_MOVE_SELF
+					| inotify::ffi::IN_MOVE) {
+
+				Ok(_)      => (),
+				Err(error) => fail!("Error adding watch: {}\n", error)
+			};
+
 			match fs::readdir(path) {
 				Ok(paths)  => add_files(inotify, paths.as_slice()),
 				Err(error) => fail!(error)
