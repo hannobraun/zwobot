@@ -10,6 +10,8 @@ use std::io::{
 use std::io::timer;
 use time;
 
+use printer::printer;
+
 
 pub fn new(command_str: String) -> Sender<()> {
 	let command_words: Vec<String> =
@@ -65,6 +67,8 @@ fn runner(executable: String, args: &[String]) -> Sender<()> {
 
 	let (sender, receiver) = channel();
 
+	let printer = printer();
+
 	spawn(proc() {
 		loop {
 			// If multiple events have accumulated during the run, it should
@@ -100,30 +104,34 @@ fn runner(executable: String, args: &[String]) -> Sender<()> {
 				Err(error)  => fail!("{}", error)
 			};
 
-			print!("\n\n\n=== {} START {}\n", time::now().rfc3339(), command);
+			printer.send(format!(
+				"\n\n\n=== {} START {}\n", time::now().rfc3339(), command));
 
 			print(
 				"stdout".to_str(),
-				process.stdout.take().expect("no stdout"));
+				process.stdout.take().expect("no stdout"),
+				printer.clone());
 			print(
 				"stderr".to_str(),
-				process.stderr.take().expect("no stderr"));
+				process.stderr.take().expect("no stderr"),
+				printer.clone());
 
 			let _ = process.wait();
 
-			print!("=== {} FINISH {}\n", time::now().rfc3339(), command);
+			printer.send(format!(
+				"=== {} FINISH {}\n", time::now().rfc3339(), command));
 		}
 	});
 
 	sender
 }
 
-fn print(prefix: String, pipe: PipeStream) {
+fn print(prefix: String, pipe: PipeStream, printer: Sender<String>) {
 	spawn(proc() {
 		let mut reader = BufferedReader::new(pipe);
 		for l in reader.lines() {
 			match l {
-				Ok(line)   => print!("[{}] {}", prefix, line),
+				Ok(line)   => printer.send(format!("[{}] {}", prefix, line)),
 				Err(error) => fail!("{}", error)
 			}
 		}

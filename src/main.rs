@@ -11,6 +11,7 @@ use std::os;
 use inotify::INotify;
 
 
+mod printer;
 mod runner;
 
 
