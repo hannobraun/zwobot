@@ -27,7 +27,7 @@ fn main() {
 
 	let runner = runner::new(command.clone());
 
-	let inotify = match INotify::init() {
+	let mut inotify = match INotify::init() {
 		Ok(inotify) => inotify,
 		Err(error)  => fail!(error)
 	};
