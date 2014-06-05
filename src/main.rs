@@ -65,7 +65,7 @@ fn add_files(inotify: &INotify, files: &[Path]) {
 		}
 		else {
 			match inotify.add_watch(path, inotify::ffi::IN_MODIFY) {
-				Ok(watch)  => watch,
+				Ok(_)      => (),
 				Err(error) => fail!(error)
 			};
 		}
