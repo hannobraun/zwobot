@@ -1,4 +1,5 @@
 extern crate libc;
+extern crate term;
 extern crate time;
 
 extern crate inotify;

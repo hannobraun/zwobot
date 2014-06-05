@@ -1,14 +1,29 @@
 use std::comm::channel;
+use term;
 
 
-pub fn printer() -> Sender<String> {
-	let (sender, receiver) = channel();
+pub struct Output(pub Vec<term::attr::Attr>, pub String);
+
+
+pub fn printer() -> Sender<Output> {
+	let (sender, receiver) = channel::<Output>();
 
 	spawn(proc() {
-		loop {
-			let text = receiver.recv();
+		let mut stdout = match term::stdout() {
+			Some(terminal) =>
+				terminal,
+			None =>
+				fail!("Failed to retrieve stdout terminal")
+		};
 
-			print!("{}", text);
+		loop {
+			let Output(attributes, text) = receiver.recv();
+
+			for &attr in attributes.iter() {
+				let _ = stdout.attr(attr);
+			}
+			let _ = write!(stdout, "{}", text);
+			let _ = stdout.reset();
 		}
 	});
 

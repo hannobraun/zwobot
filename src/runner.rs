@@ -8,9 +8,17 @@ use std::io::{
 	PipeStream
 };
 use std::io::timer;
+use term::attr::{
+	Bold,
+	ForegroundColor
+};
+use term::color;
 use time;
 
-use printer::printer;
+use printer::{
+	Output,
+	printer
+};
 
 
 pub fn new(command_str: String) -> Sender<()> {
@@ -104,8 +112,8 @@ fn runner(executable: String, args: &[String]) -> Sender<()> {
 				Err(error)  => fail!("{}", error)
 			};
 
-			printer.send(format!(
-				"\n\n\n=== {} START {}\n", time::now().rfc3339(), command));
+			printer.send(Output(vec!(ForegroundColor(color::BRIGHT_BLUE), Bold), format!(
+				"\n\n\n=== {} START {}\n", time::now().rfc3339(), command)));
 
 			print(
 				"stdout".to_str(),
@@ -118,21 +126,29 @@ fn runner(executable: String, args: &[String]) -> Sender<()> {
 
 			let _ = process.wait();
 
-			printer.send(format!(
-				"=== {} FINISH {}\n", time::now().rfc3339(), command));
+			printer.send(Output(vec!(ForegroundColor(color::BRIGHT_BLUE), Bold), format!(
+				"=== {} FINISH {}\n", time::now().rfc3339(), command)));
 		}
 	});
 
 	sender
 }
 
-fn print(prefix: String, pipe: PipeStream, printer: Sender<String>) {
+fn print(prefix: String, pipe: PipeStream, printer: Sender<Output>) {
 	spawn(proc() {
 		let mut reader = BufferedReader::new(pipe);
 		for l in reader.lines() {
 			match l {
-				Ok(line)   => printer.send(format!("[{}] {}", prefix, line)),
-				Err(error) => fail!("{}", error)
+				Ok(line) => {
+					printer.send(
+						Output(vec!(ForegroundColor(color::BRIGHT_BLUE), Bold),
+						format!("[{}] ", prefix)));
+					printer.send(Output(vec!(),
+						format!("{}", line)))
+				},
+
+				Err(error) =>
+					fail!("{}", error)
 			}
 		}
 	});
