@@ -5,6 +5,7 @@ extern crate inotify;
 
 
 use std::io;
+use std::io::fs;
 use std::os;
 
 use inotify::INotify;
@@ -31,12 +32,13 @@ fn main() {
 		Err(error)  => fail!(error)
 	};
 
-	for file in files.iter() {
-		match inotify.add_watch(&Path::new(file.as_slice()), inotify::ffi::IN_MODIFY) {
-			Ok(watch)  => watch,
-			Err(error) => fail!(error)
-		};
-	}
+	let paths: Vec<Path> = files
+		.iter()
+		.map(|file|
+			Path::new(file.as_slice()))
+		.collect();
+
+	add_files(&inotify, paths.as_slice());
 
 	runner.send(());
 
@@ -49,6 +51,23 @@ fn main() {
 
 			Err(error) =>
 				fail!("Error retrieving inotify event: {}", error)
+		}
+	}
+}
+
+fn add_files(inotify: &INotify, files: &[Path]) {
+	for path in files.iter() {
+		if path.is_dir() {
+			match fs::readdir(path) {
+				Ok(paths)  => add_files(inotify, paths.as_slice()),
+				Err(error) => fail!(error)
+			}
+		}
+		else {
+			match inotify.add_watch(path, inotify::ffi::IN_MODIFY) {
+				Ok(watch)  => watch,
+				Err(error) => fail!(error)
+			};
 		}
 	}
 }
