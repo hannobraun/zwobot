@@ -31,7 +31,7 @@ fn main() {
 
 	let mut inotify = match INotify::init() {
 		Ok(inotify) => inotify,
-		Err(error)  => fail!(error)
+		Err(error)  => fail!("{}", error)
 	};
 
 	let paths: Vec<Path> = files
@@ -79,13 +79,13 @@ fn add_files(inotify: &INotify, files: &[Path]) {
 
 			match fs::readdir(path) {
 				Ok(paths)  => add_files(inotify, paths.as_slice()),
-				Err(error) => fail!(error)
+				Err(error) => fail!("{}", error)
 			}
 		}
 		else {
 			match inotify.add_watch(path, inotify::ffi::IN_MODIFY) {
 				Ok(_)      => (),
-				Err(error) => fail!(error)
+				Err(error) => fail!("{}", error)
 			};
 		}
 	}
