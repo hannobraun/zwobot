@@ -26,7 +26,7 @@ pub fn new(command_str: String) -> Sender<()> {
 		command_str.as_slice().words().map(|x| x.to_str()).collect();
 
 	let executable = command_words.get(0).clone();
-	let args       = command_words.tail().to_owned();
+	let args       = command_words.tail();
 
 	let runner = runner(executable, args);
 	deduplicator(runner)
