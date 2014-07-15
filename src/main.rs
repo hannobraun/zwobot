@@ -24,7 +24,7 @@ fn main() {
 		return;
 	}
 
-	let command = args.get(1).to_str();
+	let command = args.get(1).to_string();
 	let files   = args.slice_from(2);
 
 	let runner = runner::new(command.clone());

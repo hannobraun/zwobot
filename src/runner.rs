@@ -23,7 +23,7 @@ use printer::{
 
 pub fn new(command_str: String) -> Sender<()> {
 	let command_words: Vec<String> =
-		command_str.as_slice().words().map(|x| x.to_str()).collect();
+		command_str.as_slice().words().map(|x| x.to_string()).collect();
 
 	let executable = command_words.get(0).clone();
 	let args       = command_words.tail();
@@ -116,11 +116,11 @@ fn runner(executable: String, args: &[String]) -> Sender<()> {
 				"\n\n\n=== {} START {}\n", time::now().rfc3339(), command)));
 
 			print(
-				"stdout".to_str(),
+				"stdout".to_string(),
 				process.stdout.take().expect("no stdout"),
 				printer.clone());
 			print(
-				"stderr".to_str(),
+				"stderr".to_string(),
 				process.stderr.take().expect("no stderr"),
 				printer.clone());
 
